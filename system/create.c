@@ -24,6 +24,7 @@ pid32	create(
 	int32		i;
 	uint32		*a;		/* Points to list of args	*/
 	uint32		*saddr;		/* Stack address		*/
+	struct	cirbuf	*msgbuf;
 
 	mask = disable();
 	if (ssize < MINSTK)
@@ -37,8 +38,10 @@ pid32	create(
 
 	prcount++;
 	prptr = &proctab[pid];
+	msgbuf = &(prptr->prmsgbuf);
 
 	/* Initialize process table entry for new process */
+
 	prptr->prstate = PR_SUSP;	/* Initial state is suspended	*/
 	prptr->prprio = priority;
 	prptr->prstkbase = (char *)saddr;
@@ -50,7 +53,12 @@ pid32	create(
 	prptr->prparent = (pid32)getpid();
 	prptr->prhasmsg = FALSE;
 
+	msgbuf->head = msgbuf->buffer;
+	msgbuf->tail = msgbuf->buffer;
+	msgbuf->vacancy = NMSG;
+
 	/* Set up stdin, stdout, and stderr descriptors for the shell	*/
+
 	prptr->prdesc[0] = CONSOLE;
 	prptr->prdesc[1] = CONSOLE;
 	prptr->prdesc[2] = CONSOLE;
@@ -61,6 +69,7 @@ pid32	create(
 	savsp = (uint32)saddr;
 
 	/* Push arguments */
+
 	a = (uint32 *)(&nargs + 1);	/* Start of args		*/
 	a += nargs -1;			/* Last argument		*/
 	for ( ; nargs > 0 ; nargs--)	/* Machine dependent; copy args	*/

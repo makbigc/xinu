@@ -300,6 +300,14 @@ extern	bpid32	mkbufpool(int32, int32);
 extern	syscall	mount(char *, char *, did32);
 extern	int32	namlen(char *, int32);
 
+/* in file mysend.c */
+extern	syscall mysend(pid32, umsg32);
+extern	uint32	mysendn(pid32, umsg32 *, uint32);
+
+/* in file myreceive.c */
+extern	umsg32	myreceive(void);
+extern	syscall	myreceiven(umsg32 *, uint32);
+
 /* in file naminit.c */
 extern	status	naminit(void);
 
