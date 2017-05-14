@@ -2,13 +2,13 @@
 #define NPRODUCERS 3
 #define NCONSUMERS 0
 
-struct cirbuf {
+struct cirbuf_char {
     char buffer[BUFFERSIZE];
     char *head;
     char *tail;
 };
 
-struct cirbuf buffer1;
+struct cirbuf_char buffer1;
 
 char producer_tags[NPRODUCERS];
 int32 producer_sleep_times[NPRODUCERS];
@@ -31,12 +31,12 @@ sid32 fillcount;
 sid32 emptycount;
 
 
-void producer(struct cirbuf *, int32);
-void consumer(struct cirbuf *, int32);
+void producer(struct cirbuf_char *, int32);
+void consumer(struct cirbuf_char *, int32);
 
-void init_cirbuf(struct cirbuf *buffer);
-void additem(struct cirbuf *buffer, char);
-char removeitem(struct cirbuf *buffer);
+void init_cirbuf_char(struct cirbuf_char *buffer);
+void additem(struct cirbuf_char *buffer, char);
+char removeitem(struct cirbuf_char *buffer);
 
 int tag2number(char);
 

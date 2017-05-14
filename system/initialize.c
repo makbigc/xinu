@@ -26,6 +26,9 @@ struct	memblk	memlist;	/* List of free memory blocks		*/
 int	prcount;		/* Total number of live processes	*/
 pid32	currpid;		/* ID of currently executing process	*/
 
+int32	delta_prprio[2][2];
+int32	quantum[9];
+
 /* Control sequence to reset the console colors and cusor positiion	*/
 
 #define	CONSOLE_RESET	" \033[0m\033[2J\033[;H"
@@ -84,14 +87,16 @@ void	nulluser()
 
 	/* Create a process to finish startup and start main */
 
-	resume(create((void *)startup, INITSTK, INITPRIO,
-					"Startup process", 0, NULL));
-
+//	resume(create((void *)startup, INITSTK, INITPRIO,
+//					"Startup process", 0, NULL));
+	resume(create((void *)main, INITSTK, INITPRIO,
+					"Main process", 0, NULL));
+	
 	/* Become the Null process (i.e., guarantee that the CPU has	*/
 	/*  something to run when no other process is ready to execute)	*/
 
 	while (TRUE) {
-		;		/* Do nothing */
+		;	/* Do nothing */
 	}
 
 }
@@ -111,12 +116,12 @@ local process	startup(void)
 
 
 	/* Use DHCP to obtain an IP address and format it */
-
 	ipaddr = getlocalip();
+//	ipaddr = SYSERR;
 	if ((int32)ipaddr == SYSERR) {
 		kprintf("Cannot obtain an IP address\n");
 	} else {
-		/* Print the IP in dotted decimal and hex */
+		// Print the IP in dotted decimal and hex 
 		ipaddr = NetData.ipucast;
 		sprintf(str, "%d.%d.%d.%d",
 			(ipaddr>>24)&0xff, (ipaddr>>16)&0xff,
@@ -125,8 +130,9 @@ local process	startup(void)
 		kprintf("Obtained IP address  %s   (0x%08x)\n", str,
 								ipaddr);
 	}
-	/* Create a process to execute function main() */
 
+	/* Create a process to execute function main() */
+	kprintf("Create a process main()\n");
 	resume(create((void *)main, INITSTK, INITPRIO,
 					"Main process", 0, NULL));
 
@@ -220,6 +226,22 @@ static	void	sysinit()
 	for (i = 0; i < NDEVS; i++) {
 		init(i);
 	}
+
+	/* Initialize the dynamic-priority scheduler */
+
+	delta_prprio[PRCLS_CPUB][PRCLS_CPUB] = -1;
+	delta_prprio[PRCLS_CPUB][PRCLS_IOB]  = 2;
+	delta_prprio[PRCLS_IOB][PRCLS_CPUB]  = -2;
+	delta_prprio[PRCLS_IOB][PRCLS_IOB]   = 1;
+
+	for (i = 0; i <= 5; i++) {
+		quantum[i] = 20 + 20 * i;
+	}
+
+	for (i = 6; i <=8; i++) {
+		quantum[i] = 40 + 20 * i;
+	}
+
 	return;
 }
 

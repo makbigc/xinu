@@ -32,6 +32,7 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 		/* Old process will no longer remain current */
 
 		ptold->prstate = PR_READY;
+		ptold->pr_tsready = clktime;
 		insert(currpid, readylist, ptold->prprio);
 	}
 
@@ -40,7 +41,15 @@ void	resched(void)		/* Assumes interrupts are disabled	*/
 	currpid = dequeue(readylist);
 	ptnew = &proctab[currpid];
 	ptnew->prstate = PR_CURR;
-	preempt = QUANTUM;		/* Reset time slice for process	*/
+
+	/* Reset time slice for process	*/
+	//preempt = QUANTUM;
+	if (ptnew->prprio == NETPRIO){
+		preempt = 10;
+	} else {
+		preempt = quantum[ptnew->prprio];
+	}
+
 	ctxsw(&ptold->prstkptr, &ptnew->prstkptr);
 
 	/* Old process returns here when resumed */

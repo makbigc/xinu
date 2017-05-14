@@ -47,6 +47,8 @@ syscall	sleepms(
 	}
 
 	proctab[currpid].prstate = PR_SLEEP;
+	//proctab[currpid].pr_class = PRCLS_IOB;
+	chprcls(currpid, PRCLS_IOB);
 	resched();
 	restore(mask);
 	return OK;

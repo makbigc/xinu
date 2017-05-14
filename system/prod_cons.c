@@ -1,6 +1,6 @@
 #include <xinu.h>
 
-void producer(struct cirbuf *buffer, int32 i)
+void producer(struct cirbuf_char *buffer, int32 i)
 {
     while(1) {
         for (int j=0; j < producer_counts[i]; j++) {
@@ -13,7 +13,7 @@ void producer(struct cirbuf *buffer, int32 i)
     }
 }
 
-void consumer(struct cirbuf *buffer, int32 i)
+void consumer(struct cirbuf_char *buffer, int32 i)
 {
     char tag;
     int k;
@@ -30,13 +30,13 @@ void consumer(struct cirbuf *buffer, int32 i)
     }
 }
 
-void init_cirbuf(struct cirbuf *buffer)
+void init_cirbuf_char(struct cirbuf_char *buffer)
 {
     buffer->head = buffer->buffer;
     buffer->tail = buffer->buffer;
 }
 
-void additem(struct cirbuf *buffer, char item)
+void additem(struct cirbuf_char *buffer, char item)
 {
     wait(head_mutex);
 
@@ -48,7 +48,7 @@ void additem(struct cirbuf *buffer, char item)
     signal(head_mutex);
 }
 
-char removeitem(struct cirbuf *buffer)
+char removeitem(struct cirbuf_char *buffer)
 {
     char item;
 
@@ -101,7 +101,7 @@ void start_prod_con(void)
 */
 
     //Intialization of the circular buffer
-    init_cirbuf(&buffer1);
+    init_cirbuf_char(&buffer1);
 
     for (int i=0; i<NPRODUCERS ; i++) {
         producer_id[i]=create(producer, 1024, 20, producer_tags[i], 2, &buffer1, i);

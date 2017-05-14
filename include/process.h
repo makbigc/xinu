@@ -18,6 +18,11 @@
 #define	PR_RECTIM	7	/* Process is receiving with timeout	*/
 #define PR_MYRECV	8
 
+/* Process classification based on sources */
+
+#define PRCLS_CPUB	0	/* Process is bound to CPU */
+#define PRCLS_IOB	1	/* Process is bound to I/O */
+
 /* Miscellaneous process definitions */
 
 #define	PNMLEN		16	/* Length of process "name"		*/
@@ -26,7 +31,7 @@
 /* Process initialization constants */
 
 #define	INITSTK		65536	/* Initial process stack size		*/
-#define	INITPRIO	20	/* Initial process priority		*/
+#define	INITPRIO	4	/* Initial process priority		*/
 #define	INITRET		userret	/* Address to which process returns	*/
 
 /* Inline code to check process ID (assumes interrupts are disabled)	*/
@@ -66,6 +71,10 @@ struct procent {		/* Entry in the process table		*/
 	struct cirbuf	prmsgbuf;
 	bool8		prhasmsg;	/* Nonzero iff msg is valid	*/
 	int16		prdesc[NDESC];	/* Device descriptors for process*/
+	bool8		delayed_suspend_flag;
+	uint32		pr_cputime;	/* in millisecond*/
+	uint32		pr_tsready;	/* timestamp when set to ready state*/
+	bool8		pr_class;	/* bound to which resource*/
 };
 
 /* Marker for the top of a process stack (used to help detect overflow)	*/
@@ -74,3 +83,6 @@ struct procent {		/* Entry in the process table		*/
 extern	struct	procent proctab[];
 extern	int32	prcount;	/* Currently active processes		*/
 extern	pid32	currpid;	/* Currently executing process		*/
+
+int32	delta_prprio[2][2];
+int32	quantum[9];

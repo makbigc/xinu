@@ -57,6 +57,13 @@ pid32	create(
 	msgbuf->tail = msgbuf->buffer;
 	msgbuf->vacancy = NMSG;
 
+	prptr->delayed_suspend_flag = FALSE;
+
+	prptr->pr_cputime = 0;
+	prptr->pr_tsready = 0;
+
+	prptr->pr_class = PRCLS_CPUB;
+
 	/* Set up stdin, stdout, and stderr descriptors for the shell	*/
 
 	prptr->prdesc[0] = CONSOLE;

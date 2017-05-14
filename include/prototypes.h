@@ -15,6 +15,9 @@ extern	status	ascdate(uint32, char *);
 /* in file bufinit.c */
 extern	status	bufinit(void);
 
+/* in file chprprio.c*/
+extern	pri16	chprcls(pid32, bool8);
+
 /* in file chprio.c */
 extern	pri16	chprio(pid32, pri16);
 
@@ -303,6 +306,12 @@ extern	int32	namlen(char *, int32);
 /* in file mysend.c */
 extern	syscall mysend(pid32, umsg32);
 extern	uint32	mysendn(pid32, umsg32 *, uint32);
+
+/* in file mysignal.c*/
+extern	syscall	mysignal(sid32);
+
+/* in file mysuspend.c */
+extern	syscall	mysuspend(pid32);
 
 /* in file myreceive.c */
 extern	umsg32	myreceive(void);

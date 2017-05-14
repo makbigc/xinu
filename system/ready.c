@@ -22,6 +22,7 @@ status	ready(
 
 	prptr = &proctab[pid];
 	prptr->prstate = PR_READY;
+//	prptr->pr_class = PRCLS_CPUB;
 	insert(pid, readylist, prptr->prprio);
 	resched();
 

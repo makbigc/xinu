@@ -1,12 +1,6 @@
-/* suspend.c - suspend */
-
 #include <xinu.h>
 
-/*------------------------------------------------------------------------
- *  suspend  -  Suspend a process, placing it in hibernation
- *------------------------------------------------------------------------
- */
-syscall	suspend(
+syscall	mysuspend(
 	  pid32		pid		/* ID of process to suspend	*/
 	)
 {
@@ -20,25 +14,32 @@ syscall	suspend(
 		return SYSERR;
 	}
 
-	/* Only suspend a process that is current or ready */
-
 	prptr = &proctab[pid];
-	if ((prptr->prstate != PR_CURR) && (prptr->prstate != PR_READY)) {
+
+	/*if ((prptr->prstate != PR_CURR) && (prptr->prstate != PR_READY)) {
 		restore(mask);
 		return SYSERR;
-	}
-	if (prptr->prstate == PR_READY) {
+	}*/
+
+	if ((prptr->prstate == PR_SUSP)
+	    ||(prptr->delayed_suspend_flag == TRUE))
+		return SYSERR;
+
+	if ((prptr->prstate == PR_WAIT)
+	    ||(prptr->prstate == PR_SLEEP)
+	    ||(prptr->prstate == PR_RECV)
+	    ||(prptr->prstate == PR_RECTIM))
+		prptr->delayed_suspend_flag = TRUE;
+	else if (prptr->prstate == PR_READY) {
 		getitem(pid);		    /* Remove a ready process	*/
 					    /*   from the ready list	*/
 		prptr->prstate = PR_SUSP;
-		//prptr->pr_class = PRCLS_IOB;
-		chprcls(currpid, PRCLS_IOB);
 	} else {
 		prptr->prstate = PR_SUSP;   /* Mark the current process	*/
-		//prptr->pr_class = PRCLS_IOB;
-		chprcls(currpid, PRCLS_IOB);
 		resched();		    /*   suspended and resched.	*/
 	}
+
+
 	prio = prptr->prprio;
 	restore(mask);
 	return prio;
