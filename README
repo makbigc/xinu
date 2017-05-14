@@ -1,0 +1,5 @@
+XINU is an OS for embedded systems.
+In this repository, three features are added for the author's practice:
+1.implement producer-and-consumer simulation
+2.add 4 system calls for IPC
+3.add new process status
